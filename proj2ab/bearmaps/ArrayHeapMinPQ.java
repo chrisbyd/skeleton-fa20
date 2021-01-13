@@ -8,6 +8,7 @@ public class ArrayHeapMinPQ<T> implements ExtrinsicMinPQ<T> {
     private class Node{
         private T item;
         private double priority;
+        private int index;
         private Node left,right;
 
         public Node(T item, double priority){
@@ -15,6 +16,15 @@ public class ArrayHeapMinPQ<T> implements ExtrinsicMinPQ<T> {
             this.priority = priority;
             this.left = null;
             this.right = null;
+            this.index = -2;
+        }
+
+        public void setPriority(double priority){
+            this.priority = priority;
+        }
+
+        public int getIndex(){
+            return this.index;
         }
 
     }
@@ -115,7 +125,8 @@ public class ArrayHeapMinPQ<T> implements ExtrinsicMinPQ<T> {
         public void insert(Node node){
             this.size += 1;
             this.items.set(size,node);
-            swim(size);
+            int index = swim(size);
+            node.index = index;
         }
 
         public int parent(int k){
@@ -144,13 +155,15 @@ public class ArrayHeapMinPQ<T> implements ExtrinsicMinPQ<T> {
             return this.items.get(1);
         }
 
-        public void swim(int k){
-          if(k == 1) return ;
+        public int swim(int k){
+          if(k == 1) return 1;
           if(this.items.get(parent(k)).priority > this.items.get(k).priority)
           {
               this.swap(k,parent(k));
-              swim(parent(k));
+              return swim(parent(k));
           }
+          return k;
+
         }
 
         public Node removeSmallest(){
@@ -234,6 +247,11 @@ public class ArrayHeapMinPQ<T> implements ExtrinsicMinPQ<T> {
 
     @Override
     public void changePriority(T item, double priority) {
-        if (!contains(item)) throw new NoSuchElementException("The ")
+        if (!contains(item)) throw new NoSuchElementException("The element doesnt exists");
+        Node node = this.bst.contains(item);
+        int index = node.getIndex();
+        node.setPriority(priority);
+        this.mpq.swim(index);
+        this.mpq.sink(node.getIndex());
     }
 }
